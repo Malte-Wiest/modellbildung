@@ -122,7 +122,7 @@ double Schwingung::realSignalRauschAbstand(Schwingung& vergleich)
 		return 10000000.0;
 	}
 	double erg = sumOrig / sumVergleichMinusOrig;
-	erg = std::log(erg);
+	erg = log(erg);
 	erg *= 10;
 	return erg;
 }

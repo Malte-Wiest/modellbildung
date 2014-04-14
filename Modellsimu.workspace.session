@@ -1,12 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Session Name="/home/itztli/workspace/Modellsimu/Modellsimu/Modellsimu.workspace">
-  <int Value="0" Name="m_selectedTab"/>
-  <wxString Value="/home/itztli/workspace/Modellsimu/Modellsimu/Modellsimu.workspace" Name="m_workspaceName"/>
+<Session Name="/home/itztli/workspace/Modellsimu/termin1/modellbildung/Modellsimu.workspace">
+  <int Value="2" Name="m_selectedTab"/>
+  <wxString Value="/home/itztli/workspace/Modellsimu/termin1/modellbildung/Modellsimu.workspace" Name="m_workspaceName"/>
   <TabInfoArray Name="TabInfoArray">
     <TabInfo>
-      <wxString Value="/home/itztli/workspace/Modellsimu/Modellsimu/main.cpp" Name="FileName"/>
+      <wxString Value="/home/itztli/workspace/Modellsimu/termin1/modellbildung/Schwingung.cpp" Name="FileName"/>
+      <int Value="100" Name="FirstVisibleLine"/>
+      <int Value="126" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="/home/itztli/workspace/Modellsimu/termin1/modellbildung/Schwingung.h" Name="FileName"/>
       <int Value="0" Name="FirstVisibleLine"/>
-      <int Value="19" Name="CurrentLine"/>
+      <int Value="26" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="/home/itztli/workspace/Modellsimu/termin1/modellbildung/main.cpp" Name="FileName"/>
+      <int Value="127" Name="FirstVisibleLine"/>
+      <int Value="129" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
     </TabInfo>
   </TabInfoArray>

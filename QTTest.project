@@ -85,5 +85,7 @@
   </Settings>
   <VirtualDirectory Name="src">
     <File Name="main.cpp"/>
+    <File Name="Schwingung.cpp"/>
+    <File Name="Schwingung.h"/>
   </VirtualDirectory>
 </CodeLite_Project>
