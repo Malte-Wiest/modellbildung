@@ -22,5 +22,10 @@ public:
 	double realSignalRauschAbstand(Schwingung& vergleich);
 	double getRealPart(int index);
 	double getImaginaryPart(int index);
+	double getAbsoluteValue(int index);
+	void qunatisierungRealValues(double delta);
+	double getMaxValue();
+	double getMinValue();
+	int maxFrequency();
 };
 

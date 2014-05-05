@@ -122,7 +122,73 @@ double Schwingung::realSignalRauschAbstand(Schwingung& vergleich)
 		return 10000000.0;
 	}
 	double erg = sumOrig / sumVergleichMinusOrig;
-	erg = log(erg);
+	erg = std::log(erg);
 	erg *= 10;
 	return erg;
+}
+
+double Schwingung::getAbsoluteValue(int index)
+{
+	double erg = this->getRealPart(index) * this->getRealPart(index);
+	double temp = this->getImaginaryPart(index) * this->getImaginaryPart(index);
+	erg += temp;
+	erg = std::sqrt(erg);
+	return erg;
+}
+
+void Schwingung::qunatisierungRealValues(double delta)
+{
+	int signum;
+	double quantValue, temp;
+	for (int i=0; i<this->usedComplexElements; ++i)
+	{
+		signum = 1;
+		if (this->getRealPart(i) < 0)
+			signum = (-1);
+		quantValue = delta;
+		temp = this->getAbsoluteValue(i) / delta;
+		temp += 0.5;
+		quantValue *= std::floor(temp);
+		quantValue *= signum;
+		this->addElement(i, quantValue);
+	}
+}
+
+double Schwingung::getMaxValue()
+{
+	double max = this->getRealPart(0);
+	for (int i=1; i<this->usedComplexElements; ++i)
+	{
+		if (max < this->getRealPart(i))
+			max = this->getRealPart(i);
+	}
+	return max;
+}
+
+double Schwingung::getMinValue()
+{
+	double min = this->getRealPart(0);
+	for (int i=1; i<this->usedComplexElements; ++i)
+	{
+		if (min > this->getRealPart(i))
+			min = this->getRealPart(i);
+	}
+	return min;
+}
+
+int Schwingung::maxFrequency()
+{
+	double max;
+	double maxIndex;
+	max = this->getAbsoluteValue(0);
+	maxIndex = 0;
+	for (int i=0; i<this->usedComplexElements; i++)
+	{
+		if (max < this->getAbsoluteValue(i))
+		{
+			max = this->getAbsoluteValue(i);
+			maxIndex = i;
+		}
+	}
+	return maxIndex;
 }
