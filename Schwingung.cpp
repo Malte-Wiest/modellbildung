@@ -122,7 +122,7 @@ double Schwingung::realSignalRauschAbstand(Schwingung& vergleich)
 		return 10000000.0;
 	}
 	double erg = sumOrig / sumVergleichMinusOrig;
-	erg = std::log(erg);
+	erg = log(erg);
 	erg *= 10;
 	return erg;
 }
@@ -132,7 +132,7 @@ double Schwingung::getAbsoluteValue(int index)
 	double erg = this->getRealPart(index) * this->getRealPart(index);
 	double temp = this->getImaginaryPart(index) * this->getImaginaryPart(index);
 	erg += temp;
-	erg = std::sqrt(erg);
+	erg = sqrt(erg);
 	return erg;
 }
 
@@ -148,7 +148,7 @@ void Schwingung::qunatisierungRealValues(double delta)
 		quantValue = delta;
 		temp = this->getAbsoluteValue(i) / delta;
 		temp += 0.5;
-		quantValue *= std::floor(temp);
+		quantValue *= floor(temp);
 		quantValue *= signum;
 		this->addElement(i, quantValue);
 	}
