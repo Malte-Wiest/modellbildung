@@ -1,18 +1,23 @@
 #include "Schwingung.h"
 
-const double Schwingung::pi = 3.14159265358979323846;
+const double Schwingung::pi=4*atan((double)1);
 
 Schwingung::Schwingung(void)
 {
+	vector=NULL;  
 }
 
 
 Schwingung::~Schwingung(void)
 {
+	if(vector!=NULL)   
+		 delete [] vector;
 }
 
-Schwingung::Schwingung(int size)
+Schwingung::Schwingung(int size, int sampleRate)
 {
+	vector=NULL;  
+	this->sampleRate = sampleRate;
 	this->setSize(size);
 }
 
@@ -52,58 +57,108 @@ void Schwingung::swapElements(int i, int j)
 
 void Schwingung::fourier(bool inverse)
 {
-    unsigned long n, mmax, m, j, istep, i;
-    double wtemp, wr, wpr, wpi, wi, theta;
-    double tempr, tempi;
- 
-    // reverse-binary reindexing
-    n = this->usedComplexElements << 1;
-    j = 1;
-    for (i = 1; i < n; i += 2) {
-        if (j > i) {
-            swapElements(this->mSchwingung[j-1], this->mSchwingung[i-1]);
-            swapElements(this->mSchwingung[j], this->mSchwingung[i]);
-        }
-        m = this->usedComplexElements;
-        while (m >= 2 && j > m) {
-            j -= m;
-            m >>= 1;
-        }
-        j += m;
-    };
- 
-    // here begins the Danielson-Lanczos section
-    mmax = 2;
-    while (n > mmax) 
-	{
-        istep = mmax<<1;
-        theta = -(2*this->pi / mmax);
-		if (inverse)
-		{
-			theta *= (-1);
+	int sign;
+	if (inverse)
+		sign = 1;
+	else
+		sign = -1;
+    //variables for the fft   
+    unsigned long n,mmax,m,j,istep,i;   
+    double wtemp,wr,wpr,wpi,wi,theta,tempr,tempi;   
+   
+    //the complex array is real+complex so the array    
+    //as a size n = 2* number of complex samples   
+    //real part is the data[index] and    
+    //the complex part is the data[index+1]   
+   
+    //new complex array of size n=2*sample_rate   
+    if(vector!=NULL)   
+        delete [] vector;   
+	int size = 2;
+	while (size < (2*this->sampleRate))
+		size*=2;
+	vector=new float [size];
+	for (int index=0; index<size; index++)
+		vector[index] = 0;
+   
+    //put the real array in a complex array   
+    //the complex part is filled with 0's   
+    //the remaining vector with no data is filled with 0's  
+	
+    for(n=0; n<2*this->sampleRate;n++)   
+    {   
+		vector[n] = this->mSchwingung[n];
+		/*if(n<this->usedComplexElements)   {
+			vector[2*n]=this->getRealPart(n);   
+			vector[2*n+1] = this->getImaginaryPart(n);
 		}
-        wtemp = sin(0.5 * theta);
-        wpr = -2.0 * wtemp * wtemp;
-        wpi = sin(theta);
-        wr = 1.0;
-        wi = 0.0;
-        for (m = 1; m < mmax; m += 2) {
-            for (i = m; i <= n; i += istep) {
-                j = i + mmax;
-                tempr = wr * this->mSchwingung[j-1] - wi * this->mSchwingung[j];
-                tempi = wr * this->mSchwingung[j] + wi * this->mSchwingung[j-1];
- 
-                this->mSchwingung[j-1] = this->mSchwingung[i-1] - tempr;
-                this->mSchwingung[j] = this->mSchwingung[i] - tempi;
-                this->mSchwingung[i-1] += tempr;
-                this->mSchwingung[i] += tempi;
-            }
-            wtemp = wr;
-            wr += wr * wpr - wi * wpi;
-            wi += wi * wpr + wtemp * wpi;
-        }
-        mmax = istep;
+        else   {
+            vector[2*n]=0;   
+			vector[2*n+1]=0;  
+		}*/
+		
+    }   
+   
+    //binary inversion (note that the indexes    
+    //start from 0 witch means that the   
+    //real part of the complex is on the even-indexes    
+    //and the complex part is on the odd-indexes)   
+    n=this->sampleRate << 1;   
+    j=0;   
+    for (i=0;i<n/2;i+=2) {   
+        if (j > i) {   
+            SWAP(vector[j],vector[i]);   
+            SWAP(vector[j+1],vector[i+1]);   
+            if((j/2)<(n/4)){   
+                SWAP(vector[(n-(i+2))],vector[(n-(j+2))]);   
+                SWAP(vector[(n-(i+2))+1],vector[(n-(j+2))+1]);   
+            }   
+        }   
+        m=n >> 1;   
+        while (m >= 2 && j >= m) {   
+            j -= m;   
+            m >>= 1;   
+        }   
+        j += m;   
     }
+	
+    //end of the bit-reversed order algorithm   
+   
+    //Danielson-Lanzcos routine   
+    mmax=2;   
+    while (n > mmax) {   
+        istep=mmax << 1;   
+        theta=sign*(2*pi/mmax);   
+        wtemp=sin(0.5*theta);   
+        wpr = -2.0*wtemp*wtemp;   
+        wpi=sin(theta);   
+        wr=1.0;   
+        wi=0.0;   
+        for (m=1;m<mmax;m+=2) {   
+            for (i=m;i<=n;i+=istep) {   
+                j=i+mmax;   
+                tempr=wr*vector[j-1]-wi*vector[j];   
+                tempi=wr*vector[j]+wi*vector[j-1];  
+				if (abs(vector[j]) > 100000000000 || abs(vector[j]) < -100000000000)
+					int a = 0;
+				if (abs(vector[i]) > 100000000000 || abs(vector[i]) < -100000000000)
+					int a = 0;
+				if (abs(vector[j-1]) > 100000000000 || abs(vector[j-1]) < -100000000000)
+					int a = 0;
+				if (abs(vector[i]-1) > 100000000000 || abs(vector[i]-1) < -100000000000)
+					int a = 0;
+                vector[j-1]=vector[i-1]-tempr;   
+                vector[j]=vector[i]-tempi;   
+                vector[i-1] += tempr;   
+                vector[i] += tempi;   
+            }   
+            wr=(wtemp=wr)*wpr-wi*wpi+wr;   
+            wi=wi*wpr+wtemp*wpi+wi;   
+        }   
+        mmax=istep;   
+    }   
+	float temp = vector[0];
+   float temp2 = vector[1];
 }
 
 double Schwingung::realSignalRauschAbstand(Schwingung& vergleich)
@@ -122,7 +177,7 @@ double Schwingung::realSignalRauschAbstand(Schwingung& vergleich)
 		return 10000000.0;
 	}
 	double erg = sumOrig / sumVergleichMinusOrig;
-	erg = log(erg);
+	erg = std::log(erg);
 	erg *= 10;
 	return erg;
 }
@@ -132,7 +187,7 @@ double Schwingung::getAbsoluteValue(int index)
 	double erg = this->getRealPart(index) * this->getRealPart(index);
 	double temp = this->getImaginaryPart(index) * this->getImaginaryPart(index);
 	erg += temp;
-	erg = sqrt(erg);
+	erg = std::sqrt(erg);
 	return erg;
 }
 
@@ -148,7 +203,7 @@ void Schwingung::qunatisierungRealValues(double delta)
 		quantValue = delta;
 		temp = this->getAbsoluteValue(i) / delta;
 		temp += 0.5;
-		quantValue *= floor(temp);
+		quantValue *= std::floor(temp);
 		quantValue *= signum;
 		this->addElement(i, quantValue);
 	}
@@ -178,17 +233,20 @@ double Schwingung::getMinValue()
 
 int Schwingung::maxFrequency()
 {
-	double max;
-	double maxIndex;
-	max = this->getAbsoluteValue(0);
-	maxIndex = 0;
-	for (int i=0; i<this->usedComplexElements; i++)
-	{
-		if (max < this->getAbsoluteValue(i))
-		{
-			max = this->getAbsoluteValue(i);
-			maxIndex = i;
-		}
-	}
-	return maxIndex;
+	int fundamental_frequency=0;   
+	double max = sqrt(pow(vector[0],2)+pow(vector[0+1],2));
+	double temp;
+    for(int i=2; i<=this->sampleRate/2; i+=2)   
+    {   
+		temp = sqrt(pow(vector[i],2)+pow(vector[i+1],2));
+        if(temp>max){   
+            fundamental_frequency=i;   
+			max = temp;
+        }   
+    }   
+   
+    //since the array of complex has the format [real][complex]=>[absolute value]   
+    //the maximum absolute value must be ajusted to half   
+    fundamental_frequency=(long)floor((float)fundamental_frequency/2);  
+	return fundamental_frequency;
 }

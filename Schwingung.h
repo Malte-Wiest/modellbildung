@@ -3,16 +3,20 @@
 #include <vector>
 #include <math.h>
 
+#define SWAP(a,b) tempr=(a);(a)=(b);(b)=tempr 
+
 class Schwingung
 {
 private:
 	static const double pi;
+	int sampleRate;
 	int usedComplexElements;
 	std::vector<double> mSchwingung;
+	float* vector;
 
 public:
 	Schwingung(void);
-	Schwingung(int size);
+	Schwingung(int size, int sampleRate);
 	~Schwingung(void);
 
 	void setSize(int size);
