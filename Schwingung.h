@@ -13,6 +13,9 @@ private:
 	int usedComplexElements;
 	std::vector<double> mSchwingung;
 	float* vector;
+	double Mittelert;
+	double Varianz;
+	double Standardabweichung;
 
 public:
 	Schwingung(void);
@@ -31,5 +34,9 @@ public:
 	double getMaxValue();
 	double getMinValue();
 	int maxFrequency();
+	void calculateStatistics();
+	double getRealMittelwert();
+	double getRealVarianz();
+	double getRealStandardabweichung();
 };
 

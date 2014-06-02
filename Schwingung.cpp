@@ -250,3 +250,38 @@ int Schwingung::maxFrequency()
     fundamental_frequency=(long)floor((float)fundamental_frequency/2);  
 	return fundamental_frequency;
 }
+
+void Schwingung::calculateStatistics()
+{
+	double sum = 0;
+	double varianzSumme = 0;
+	for (int i = 0; i < this->usedComplexElements; ++i)
+	{
+		sum += this->getRealPart(i);
+	}
+	this->Mittelert = sum / this->usedComplexElements;
+	sum = 0;
+	double temp;
+	for (int i = 0; i < this->usedComplexElements; ++i)
+	{
+		temp = this->getRealPart(i) - this->Mittelert;
+		sum += temp * temp;
+	}
+	this->Varianz = (1/(this->usedComplexElements - 1) * sum);
+	this->Standardabweichung = std::sqrt(this->Varianz);
+}
+
+double Schwingung::getRealMittelwert()
+{
+	return this->Mittelert;
+}
+
+double Schwingung::getRealStandardabweichung()
+{
+	return this->Standardabweichung;
+}
+
+double Schwingung::getRealVarianz()
+{
+	return this->Varianz;
+}
