@@ -12,6 +12,11 @@ private:
 	int sampleRate;
 	int usedComplexElements;
 	std::vector<double> mSchwingung;
+	std::vector<double> sinusPart;
+	std::vector<double> cosinusPart;
+	std::vector<double> inverseFourierResult;
+	std::vector<double> betragsspectrum;
+	std::vector<double> phasenspectrum;
 	float* vector;
 	double Mittelert;
 	double Varianz;
@@ -38,5 +43,13 @@ public:
 	double getRealMittelwert();
 	double getRealVarianz();
 	double getRealStandardabweichung();
+	void neue_fourier_transformation();
+	void neue_inverse_fourier();
+	int getMaxSinusPart();
+	int getMaxCosPart();
+	void calculateBetragsspectrum();
+	void calculatePhasenspectrum();
+	std::vector<double>& getBetragsspectrum();
+	std::vector<double>& getPhasenspectrum();
 };
 

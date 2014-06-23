@@ -285,3 +285,108 @@ double Schwingung::getRealVarianz()
 {
 	return this->Varianz;
 }
+
+void Schwingung::neue_fourier_transformation()
+{
+	int N = this->usedComplexElements;
+	this->cosinusPart.resize(1+N/2, 0);
+	this->sinusPart.resize(1+N/2, 0);
+	for(int i=0; i<=N/2; i++) // Frequenz 
+	{
+		for(int n=0; n<N; n++) // Abtastwerte 
+		{
+			this->cosinusPart[i] += this->getRealPart(n) * std::cos((2*pi*n*i)/N); // Korrelation 
+		}
+	}
+	for(int i=0; i<=N/2; i++) // Frequenz 
+	{
+		for(int n=0; n<N; n++) // Abtastwerte 
+		{
+			this->sinusPart[i] += this->getRealPart(n) * std::sin((2*pi*n*i)/N); // Korrelation 
+		}
+	}
+}
+
+void Schwingung::neue_inverse_fourier()
+{
+	this->inverseFourierResult.resize(this->usedComplexElements, 0);
+	int N = this->usedComplexElements;
+	double reX, imX;
+	double reXnull = this->cosinusPart[0] / (N);
+	double reXn = this->cosinusPart[N/2] / (N);
+	for (int n = 0; n < N; n++)
+	{
+		for(int i=0; i<=N/2; i++)
+		{
+			if (i == 0) {
+				reX = reXnull;
+			}
+			else if (i == N/2)
+			{
+				reX = reXn;
+			}
+			else
+			{
+				reX = this->cosinusPart[i] / (N/2);
+			}
+			imX = -1 * this->sinusPart[i] / (N/2);
+			this->inverseFourierResult[n] += reX * std::cos(2*pi*n*i) * imX * std::sin(2*pi*n*i);
+		}
+	}
+}
+
+int Schwingung::getMaxSinusPart()
+{
+	int max = 0;
+	for (int i = 0; i < this->sinusPart.size(); i++)
+	{
+		if (this->sinusPart[i] > this->sinusPart[max])
+		{
+			max = i;
+		}
+	}
+	return max;
+}
+
+int Schwingung::getMaxCosPart()
+{
+	int max = 0;
+	for (int i = 0; i < this->cosinusPart.size(); i++)
+	{
+		if (this->cosinusPart[i] > this->cosinusPart[max])
+		{
+			max = i;
+		}
+	}
+	return max;
+}
+
+void Schwingung::calculateBetragsspectrum()
+{
+	this->betragsspectrum.resize(this->cosinusPart.size(), 0);
+	double value;
+	for (int i=0; i<this->cosinusPart.size(); i++)
+	{
+		value = this->sinusPart[i] * this->sinusPart[i];
+		value += this->cosinusPart[i] * this->cosinusPart[i];
+		this->betragsspectrum[i] = std::sqrt(value);
+	}
+}
+
+void Schwingung::calculatePhasenspectrum()
+{
+	this->phasenspectrum.resize(this->cosinusPart.size(), 0);
+	for (int i=0; i<this->cosinusPart.size(); i++)
+	{
+		this->phasenspectrum[i] = std::atan2(this->sinusPart[i], this->cosinusPart[i]) * 180 / this->pi;
+	}
+}
+std::vector<double>& Schwingung::getBetragsspectrum()
+{
+	return this->betragsspectrum;
+}
+
+std::vector<double>& Schwingung::getPhasenspectrum()
+{
+	return this->phasenspectrum;
+}
